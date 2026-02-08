@@ -1,7 +1,7 @@
 # Cog ガイド
 
 Discord Bot に機能を追加するための Cog（コグ）の書き方を説明します。
-Python の経験が少なくても読めるよう、各コードの意味も丁寧に解説しています。
+各コードの意味についても解説しています。
 
 ---
 
@@ -49,7 +49,7 @@ async def setup(bot: commands.Bot) -> None:
 
 ## 各部の解説
 
-Python に不慣れな方向けに、コードの各行が何を意味するか説明します。
+各部のコードについて説明します。
 
 ### `from discord import ...` / `from discord.ext import commands`
 
