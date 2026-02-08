@@ -8,9 +8,9 @@ class Example(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
-    @app_commands.command(name="ping", description="Pong!! と返します")
+    @app_commands.command(name="ping", description="Pong!!! と返します")
     async def ping(self, interaction: Interaction) -> None:
-        await interaction.response.send_message("Pong!!")
+        await interaction.response.send_message("Pong!!!")
 
 
 async def setup(bot: commands.Bot) -> None:
