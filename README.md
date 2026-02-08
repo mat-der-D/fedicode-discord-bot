@@ -40,3 +40,4 @@ Bot の機能は discord.py の [Cog](https://discordpy.readthedocs.io/en/stable
 
 - [仕様書](docs/SPECIFICATION.md)
 - [コントリビューションガイド](docs/CONTRIBUTING.md)
+- [ローカルテストガイド](docs/local-testing.md) — Bot の作成・トークン取得からローカル起動まで

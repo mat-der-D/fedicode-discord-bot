@@ -67,3 +67,5 @@ cp .env.example .env
 uv sync
 uv run python main.py
 ```
+
+> **初めて Discord Bot を開発する方へ**: Bot の作成・トークン取得・テスト用サーバーへの招待など、ローカルで動かすまでの詳しい手順は [ローカルテストガイド](local-testing.md) を参照してください。
