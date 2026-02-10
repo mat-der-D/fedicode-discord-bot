@@ -8,7 +8,7 @@ class Namaste(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.namaste_said_today = False
-        self.target_channel_id = 1234567890  # 投稿先のチャンネルID
+        self.target_channel_id = 1134728733308227664  # 投稿先のチャンネルID
         self.check_namaste.start()
     
     def cog_unload(self) -> None:
