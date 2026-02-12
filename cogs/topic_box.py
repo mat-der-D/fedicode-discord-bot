@@ -1,6 +1,11 @@
-from discord import Interaction, app_commands, TextChannel
+from discord import Interaction, app_commands, TextChannel, Message
 from discord.ext import commands
 import random
+
+CATEGORY_TO_EMOJI = {
+    'tech': '💻',
+    'daily': '📝',
+}
 
 class TopicBox(commands.Cog):
     """お題箱bot"""
@@ -18,7 +23,7 @@ class TopicBox(commands.Cog):
     async def random_topic(
         self, 
         interaction: Interaction,
-        category: str = None
+        category: str | None = None
     ) -> None:
         channel = self.bot.get_channel(self.topic_channel_id)
         
@@ -26,22 +31,21 @@ class TopicBox(commands.Cog):
             await interaction.response.send_message("お題箱チャンネルが見つかりません")
             return
         
-        # カテゴリに応じた絵文字
-        emoji_map = {
-            'tech': '💻',
-            'daily': '📝'
-        }
+        async def gather_messages(channel: TextChannel, category: str | None) -> list[Message]:
+            messages = []
+            ...
+            return messages
         
         # チャンネルのメッセージを取得
-        messages = []
+        messages = await gather_messages(channel, category)
         async for message in channel.history(limit=100):
-            # botのメッセージは除外
-            if not message.author.bot and message.content.strip() and any(reaction.emoji == '✅' for reaction in message.reactions):
+            # ✅がついたメッセージは除外
+            if any(reaction.emoji == '✅' for reaction in message.reactions):
                 continue
             
             # カテゴリ指定がある場合はフィルタリング
             if category:
-                emoji = emoji_map.get(category)
+                emoji = CATEGORY_TO_EMOJI.get(category)
                 if emoji:
                     # 指定された絵文字がリアクションについているかチェック
                     has_reaction = any(
@@ -66,16 +70,19 @@ class TopicBox(commands.Cog):
         
         # カテゴリを判定して表示
         categories = []
-        for cat_name, emoji in emoji_map.items():
+        for cat_name, emoji in CATEGORY_TO_EMOJI.items():
             if any(reaction.emoji == emoji for reaction in selected.reactions):
                 categories.append(cat_name)
         
         category_display = f" [{', '.join(categories)}]" if categories else ""
         
-        await interaction.response.send_message(
-            f"今回のお題{category_display}: {selected.content}\n"
-            f"（提案者: {selected.author.mention}）"
-        )
+        # 投稿者判別
+        if selected.author.bot:
+            message_text = f"今回のお題{category_display}: {selected.content}"
+        else:
+            message_text = f"今回のお題{category_display}: {selected.content}\n（提案者: {selected.author.mention}）"
+
+        await interaction.response.send_message(message_text)
 
     # お題をチャンネルに投稿
     @app_commands.command(name="add_topic", description="お題箱にお題を追加します")
@@ -107,12 +114,9 @@ class TopicBox(commands.Cog):
         )
         
         # カテゴリに応じてリアクションを追加
-        if category == 'tech':
+        if category in ('tech', 'both'):
             await sent_message.add_reaction('💻')
-        elif category == 'daily':
-            await sent_message.add_reaction('📝')
-        elif category == 'both':
-            await sent_message.add_reaction('💻')
+        if category in ('daily', 'both'):
             await sent_message.add_reaction('📝')
         
         # 完了通知（本人にだけ見える）
