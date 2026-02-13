@@ -7,6 +7,35 @@ CATEGORY_TO_EMOJI = {
     'daily': '📝',
 }
 
+async def gather_messages(channel: TextChannel, category: str | None) -> list[Message]:
+    return [
+        message
+        async for message in channel.history(limit=100)
+        if is_target_message(message, category)
+    ]
+
+
+def is_target_message(message: Message, category: str | None) -> bool:
+    # ✅がついたメッセージは除外
+    if any(reaction.emoji == '✅' for reaction in message.reactions):
+        return False
+
+    # カテゴリ指定なしの場合は全て対象
+    if not category:
+        return True
+
+    # カテゴリ指定がある場合はフィルタリング
+    emoji = CATEGORY_TO_EMOJI.get(category)
+    if not emoji:
+        return False
+
+    # 指定された絵文字がリアクションについているかチェック
+    has_reaction = any(
+        reaction.emoji == emoji
+        for reaction in message.reactions
+    )
+    return has_reaction
+
 class TopicBox(commands.Cog):
     """お題箱bot"""
     
@@ -31,32 +60,8 @@ class TopicBox(commands.Cog):
             await interaction.response.send_message("お題箱チャンネルが見つかりません")
             return
         
-        async def gather_messages(channel: TextChannel, category: str | None) -> list[Message]:
-            messages = []
-            ...
-            return messages
-        
         # チャンネルのメッセージを取得
         messages = await gather_messages(channel, category)
-        async for message in channel.history(limit=100):
-            # ✅がついたメッセージは除外
-            if any(reaction.emoji == '✅' for reaction in message.reactions):
-                continue
-            
-            # カテゴリ指定がある場合はフィルタリング
-            if category:
-                emoji = CATEGORY_TO_EMOJI.get(category)
-                if emoji:
-                    # 指定された絵文字がリアクションについているかチェック
-                    has_reaction = any(
-                        reaction.emoji == emoji 
-                        for reaction in message.reactions
-                    )
-                    if has_reaction:
-                        messages.append(message)
-            else:
-                # カテゴリ指定なしの場合は全て対象
-                messages.append(message)
         
         if not messages:
             category_text = f"（{category}カテゴリ）" if category else ""
