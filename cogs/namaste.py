@@ -33,6 +33,9 @@ class Namaste(commands.Cog):
             'なま☆すて'
         ]
     
+    def random_namaste(self) -> str:
+        return random.choice(self.namaste_variations)
+
     def cog_unload(self) -> None:
         self.check_namaste.cancel()
     
@@ -44,7 +47,7 @@ class Namaste(commands.Cog):
         if 'ﾅﾏｽﾃ' in message.content:
             self.namaste_said_today = True
             # ランダムにバリエーションを選択
-            response = random.choice(self.namaste_variations)
+            response = self.random_namaste
             await message.reply(response)
 
     @tasks.loop(time=time(hour=0, minute=0, tzinfo=TZ_TOKYO))  # 毎日0:00にリセット
@@ -57,7 +60,7 @@ class Namaste(commands.Cog):
         if not self.namaste_said_today:
             channel = self.bot.get_channel(self.target_channel_id)
             if channel:
-                await channel.send(random.choice(self.namaste_variations))  # こっちは返信先がないので普通の投稿
+                await channel.send(self.random_namaste) 
         
     @reset_flag.before_loop
     async def before_reset_flag(self) -> None:
