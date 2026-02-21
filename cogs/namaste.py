@@ -47,7 +47,7 @@ class Namaste(commands.Cog):
         if 'ﾅﾏｽﾃ' in message.content:
             self.namaste_said_today = True
             # ランダムにバリエーションを選択
-            response = self.random_namaste
+            response = self.random_namaste()
             await message.reply(response)
 
     @tasks.loop(time=time(hour=0, minute=0, tzinfo=TZ_TOKYO))  # 毎日0:00にリセット
@@ -60,7 +60,7 @@ class Namaste(commands.Cog):
         if not self.namaste_said_today:
             channel = self.bot.get_channel(self.target_channel_id)
             if channel:
-                await channel.send(self.random_namaste) 
+                await channel.send(self.random_namaste()) 
         
     @reset_flag.before_loop
     async def before_reset_flag(self) -> None:
