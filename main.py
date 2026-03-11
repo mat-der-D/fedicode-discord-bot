@@ -6,8 +6,16 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
+from services.gemini_service import GeminiService
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+class FedicodeBot(commands.Bot):
+    def __init__(self, *, gemini_service: GeminiService, **kwargs):
+        super().__init__(**kwargs)
+        self.gemini_service = gemini_service
 
 
 def main() -> None:
@@ -15,7 +23,15 @@ def main() -> None:
 
     token = os.getenv("DISCORD_TOKEN")
     if not token:
-        logger.error("DISCORD_TOKEN が設定されていません。.env ファイルを確認してください。")
+        logger.error(
+            "DISCORD_TOKEN が設定されていません。.env ファイルを確認してください。"
+        )
+        raise SystemExit(1)
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    if not gemini_key:
+        logger.error(
+            "GEMINI_API_KEY が設定されていません。.env ファイルを確認してください。"
+        )
         raise SystemExit(1)
 
     # Intents: default + message_content + members（特権 Intent）
@@ -23,7 +39,10 @@ def main() -> None:
     intents.message_content = True
     intents.members = True
 
-    bot = commands.Bot(command_prefix="!", intents=intents)
+    gemini_service = GeminiService(api_key=gemini_key)
+    bot = FedicodeBot(
+        gemini_service=gemini_service, command_prefix="!", intents=intents
+    )
 
     @bot.event
     async def setup_hook() -> None:
