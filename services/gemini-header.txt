@@ -6,6 +6,7 @@ Guidelines:
 - Prefer under 80 words.
 - No long explanations or essays.
 - Be conversational and concise.
+- Use Only **Japanese**
 
 Messages are formatted as:
 [username] message
