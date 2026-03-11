@@ -1,5 +1,4 @@
 import discord
-from discord import app_commands
 from discord.ext import commands
 
 
@@ -7,28 +6,32 @@ class Chat(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="chat")
-    async def chat(self, interaction: discord.Interaction, message: str):
-        await interaction.response.defer()
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        if message.author.bot:
+            return
+
+        if self.bot.user not in message.mentions:
+            return
 
         service = self.bot.gemini_service
 
+        user_message = message.content
+        for mention in message.mentions:
+            user_message = user_message.replace(f"<@{mention.id}>", "").strip()
+
+        if not user_message:
+            return
+
         text = await service.chat_from_channel(
-            interaction.channel,
-            user_message=message,
-            user_name=interaction.user.display_name,
+            message.channel,
+            user_message=user_message,
+            user_name=message.author.display_name,
         )
-        if text.startswith("[Bot]"):
-            text = text[len("[Bot]") :]
+        if text.startswith("[Bot] "):
+            text = text[len("[Bot] ") :]
 
-        response = (
-            f"(**ユーザー:** {message})"  #
-            "\n"  #
-            "\n"  #
-            f"{text}"  #
-        )
-
-        await interaction.followup.send(response)
+        await message.reply(text)
 
 
 async def setup(bot):
