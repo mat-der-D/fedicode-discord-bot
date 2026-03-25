@@ -14,8 +14,6 @@ class Chat(commands.Cog):
         if self.bot.user not in message.mentions:
             return
 
-        service = self.bot.gemini_service
-
         user_message = message.content
         for mention in message.mentions:
             user_message = user_message.replace(f"<@{mention.id}>", "").strip()
@@ -23,14 +21,7 @@ class Chat(commands.Cog):
         if not user_message:
             return
 
-        text = await service.chat_from_channel(
-            message.channel,
-            user_message=user_message,
-            user_name=message.author.display_name,
-        )
-        if text.startswith("[Bot] "):
-            text = text[len("[Bot] ") :]
-
+        text = self.bot.gemini_service.reply(user_message)
         await message.reply(text)
 
 
