@@ -39,7 +39,7 @@ def main() -> None:
     intents.message_content = True
     intents.members = True
 
-    gemini_service = GeminiService(api_key=gemini_key, model="gemma-3-27b-it")
+    gemini_service = GeminiService(api_key=gemini_key, model="gemma-4-31b-it")
     bot = FedicodeBot(
         gemini_service=gemini_service, command_prefix="!", intents=intents
     )
