@@ -18,10 +18,16 @@ class Chat(commands.Cog):
         for mention in message.mentions:
             user_message = user_message.replace(f"<@{mention.id}>", "").strip()
 
-        if not user_message:
+        images = [
+            (await attachment.read(), attachment.content_type)
+            for attachment in message.attachments
+            if attachment.content_type and attachment.content_type.startswith("image/")
+        ]
+
+        if not user_message and not images:
             return
 
-        text = self.bot.gemini_service.reply(user_message)
+        text = self.bot.gemini_service.reply(user_message, images=images or None)
         await message.reply(text)
 
 
